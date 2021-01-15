@@ -1,0 +1,56 @@
+<%@ Page Language="C#" AutoEventWireup="true" CodeFile="Default.aspx.cs" Inherits="_Default" %>
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head runat="server">
+    <title></title>
+   <%-- <a href="jquery.min.cache">jquery.min.cache</a>--%>
+    <script type="text/javascript" src="jquery.min.cache"></script>
+    <script type="text/javascript">
+        $(function () {
+            $.ajax({
+                type: "POST",
+                url: "Default.aspx/GetCustomers",
+                data: '{}',
+                contentType: "application/json; charset=utf-8",
+                dataType: "json",
+                success: OnSuccess,
+                failure: function (response) {
+                    alert(response.d);
+                },
+                error: function (response) {
+                    alert(response.d);
+                }
+            });
+        });
+
+        function OnSuccess(response) {
+            var xmlDoc = $.parseXML(response.d);
+            var xml = $(xmlDoc);
+            var customers = xml.find("Table");
+            var row = $("[id*=gvCustomers] tr:last-child").clone(true);
+            $("[id*=gvCustomers] tr").not($("[id*=gvCustomers] tr:first-child")).remove();
+            $.each(customers, function () {
+                var customer = $(this);
+                $("td", row).eq(0).html($(this).find("EmpName").text());
+                $("td", row).eq(1).html($(this).find("Designation").text());
+                $("td", row).eq(2).html($(this).find("Salary").text());
+                $("[id*=gvCustomers]").append(row);
+                row = $("[id*=gvCustomers] tr:last-child").clone(true);
+            });
+        }
+    </script>
+</head>
+<body>
+    <form id="form1" runat="server">
+<asp:GridView ID="gvCustomers" runat="server" AutoGenerateColumns="false" Font-Names="Arial"
+    Font-Size="10pt" RowStyle-BackColor="#A1DCF2" HeaderStyle-BackColor="#3AC0F2" HeaderStyle-ForeColor = "White">
+    <Columns>
+        <asp:BoundField ItemStyle-Width="150px" DataField="EmpName" HeaderText="EmpName" />
+        <asp:BoundField ItemStyle-Width="150px" DataField="Designation" HeaderText="Designation" />
+        <asp:BoundField ItemStyle-Width="150px" DataField="Salary" HeaderText="Salary" />
+    </Columns>
+</asp:GridView>
+    </form>
+</body>
+</html>
